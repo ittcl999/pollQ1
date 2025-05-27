@@ -1,84 +1,112 @@
-<!-- ✅ index.html: ตรวจสอบสิทธิ์ก่อนเข้าสำรวจ -->
+<!-- ✅ index.html: Login + ตรวจสอบการตอบแบบสำรวจ -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ตรวจสอบสิทธิ์</title>
+  <title>เข้าสู่ระบบเพื่อตอบแบบสำรวจ</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: 'Prompt', sans-serif;
-      background: linear-gradient(to right, #eef2f7, #e0f2fe);
+      background: linear-gradient(to right, #eff6ff, #ffffff);
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
-      color: #1e293b;
-      text-align: center;
     }
-    .card {
-      background: white;
+    .login-box {
+      background: #ffffff;
       padding: 2rem 3rem;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      max-width: 500px;
-      width: 90%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
     }
     h2 {
-      font-size: 1.75rem;
-      margin-bottom: 1rem;
       color: #1d4ed8;
+      text-align: center;
+      margin-bottom: 1.5rem;
     }
-    p {
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-size: 1rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
       font-size: 1rem;
       margin-top: 0.5rem;
+    }
+    button {
+      width: 100%;
+      margin-top: 2rem;
+      padding: 0.75rem;
+      font-size: 1rem;
+      background-color: #1d4ed8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2563eb;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>📋 กำลังตรวจสอบสิทธิ์การตอบแบบสำรวจ</h2>
-    <p>โปรดรอสักครู่ ระบบกำลังตรวจสอบว่าคุณเคยตอบแบบสำรวจแล้วหรือไม่</p>
+  <div class="login-box">
+    <h2>เข้าสู่ระบบ</h2>
+    <form id="loginForm">
+      <label for="username">ชื่อผู้ใช้</label>
+      <input type="text" id="username" required>
+      <label for="password">รหัสผ่าน</label>
+      <input type="password" id="password" required>
+      <button type="submit">เข้าสู่ระบบ</button>
+    </form>
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9fvC2qb0TE4ZClFDUjHhjvonZCdrT8eCGFSgQzI5ifKU_HBEP0pv7nWejmOxFpitR/exec';
-    const username = localStorage.getItem('username');
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycb.../exec';
 
-    if (!username) {
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
       Swal.fire({
-        icon: 'error',
-        title: 'ไม่พบข้อมูลผู้ใช้',
-        text: 'กรุณาเข้าสู่ระบบใหม่',
-        confirmButtonText: 'กลับหน้า Login'
-      }).then(() => {
-        window.location.href = 'login.html';
-      });
-    } else {
-      Swal.fire({
-        title: 'กำลังตรวจสอบ...',
-        text: 'กรุณารอสักครู่',
+        title: 'กำลังตรวจสอบข้อมูล...',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
       });
 
-      const url = `${SCRIPT_URL}?action=checkAnswered&username=${encodeURIComponent(username)}&callback=handleCheck`;
+      const url = `${SCRIPT_URL}?action=loginAndCheck&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&callback=handleLoginCheck`;
       const script = document.createElement('script');
       script.src = url;
       document.body.appendChild(script);
-    }
+    });
 
-    function handleCheck(response) {
+    function handleLoginCheck(response) {
       Swal.close();
+      if (!response.success) {
+        Swal.fire({
+          icon: 'error',
+          title: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
+        });
+        return;
+      }
+      localStorage.setItem('username', response.username);
+      localStorage.setItem('fullname', response.fullname);
       if (response.answered) {
         Swal.fire({
           icon: 'info',
           title: 'คุณได้ตอบแบบสำรวจแล้ว',
-          text: 'ขอบคุณที่ให้ความร่วมมือกับเรา',
+          text: `เมื่อวันที่ ${response.timestamp}`,
           confirmButtonText: 'ตกลง'
         });
       } else {
