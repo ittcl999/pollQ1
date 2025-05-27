@@ -1,3 +1,4 @@
+<!-- ✅ Login.html -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -5,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>เข้าสู่ระบบ</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: 'Prompt', sans-serif;
@@ -73,18 +75,34 @@
       e.preventDefault();
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
+
+      Swal.fire({
+        title: 'กำลังตรวจสอบ...',
+        text: 'กรุณารอสักครู่',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
       const url = `${SCRIPT_URL}?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&callback=handleLogin`;
       const script = document.createElement('script');
       script.src = url;
       document.body.appendChild(script);
     });
+
     function handleLogin(response) {
+      Swal.close();
       if (response.success) {
         localStorage.setItem('username', response.username);
         localStorage.setItem('fullname', response.fullname);
         window.location.href = 'poll.html';
       } else {
-        alert('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+        Swal.fire({
+          icon: 'error',
+          title: 'เข้าสู่ระบบไม่สำเร็จ',
+          text: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+        });
       }
     }
   </script>
