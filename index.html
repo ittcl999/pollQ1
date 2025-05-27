@@ -1,108 +1,59 @@
-<!-- ✅ Login.html -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>เข้าสู่ระบบ</title>
+  <title>ตรวจสอบสิทธิ์การตอบแบบสำรวจ</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: 'Prompt', sans-serif;
-      background: linear-gradient(135deg, #e0f2fe, #ffffff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .login-box {
-      background: #fff;
-      padding: 2rem 3rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-    h2 {
-      color: #1d4ed8;
-      margin-bottom: 1.5rem;
       text-align: center;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #1e293b;
-    }
-    input {
-      width: 100%;
-      padding: 0.6rem;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      margin-bottom: 1.5rem;
-      font-size: 1rem;
-    }
-    button {
-      width: 100%;
-      background-color: #1d4ed8;
-      color: white;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #2563eb;
+      padding-top: 100px;
     }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>เข้าสู่ระบบ</h2>
-    <form id="loginForm">
-      <label for="username">ชื่อผู้ใช้</label>
-      <input type="text" id="username" required>
-      <label for="password">รหัสผ่าน</label>
-      <input type="password" id="password" required>
-      <button type="submit">เข้าสู่ระบบ</button>
-    </form>
-  </div>
+  <h2>กำลังตรวจสอบข้อมูลของคุณ...</h2>
+
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9fvC2qb0TE4ZClFDUjHhjvonZCdrT8eCGFSgQzI5ifKU_HBEP0pv7nWejmOxFpitR/exec';
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
+    const username = localStorage.getItem('username');
 
+    if (!username) {
+      Swal.fire({
+        icon: 'error',
+        title: 'ไม่พบข้อมูลผู้ใช้',
+        text: 'กรุณาเข้าสู่ระบบใหม่',
+        confirmButtonText: 'กลับหน้า Login'
+      }).then(() => {
+        window.location.href = 'login.html';
+      });
+    } else {
       Swal.fire({
         title: 'กำลังตรวจสอบ...',
-        text: 'กรุณารอสักครู่',
         allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
+        didOpen: () => Swal.showLoading()
       });
 
-      const url = `${SCRIPT_URL}?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&callback=handleLogin`;
+      const url = `${SCRIPT_URL}?action=checkAnswered&username=${encodeURIComponent(username)}&callback=handleCheck`;
+
       const script = document.createElement('script');
       script.src = url;
       document.body.appendChild(script);
-    });
+    }
 
-    function handleLogin(response) {
+    function handleCheck(response) {
       Swal.close();
-      if (response.success) {
-        localStorage.setItem('username', response.username);
-        localStorage.setItem('fullname', response.fullname);
-        window.location.href = 'poll.html';
-      } else {
+      if (response.answered) {
         Swal.fire({
-          icon: 'error',
-          title: 'เข้าสู่ระบบไม่สำเร็จ',
-          text: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+          icon: 'info',
+          title: 'คุณได้ตอบแบบสำรวจแล้ว',
+          text: 'ขอบคุณที่ให้ความร่วมมือ',
+          confirmButtonText: 'ตกลง'
         });
+      } else {
+        window.location.href = 'poll.html';
       }
     }
   </script>
