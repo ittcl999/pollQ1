@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>แบบสำรวจ</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: 'Prompt', sans-serif;
@@ -66,12 +67,24 @@
     document.getElementById('pollForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const answer = document.querySelector('input[name="answer"]:checked').value;
+
+      Swal.fire({
+        title: 'กำลังส่งคำตอบ...',
+        text: 'โปรดรอสักครู่',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
       const url = `${SCRIPT_URL}?action=submitPoll&username=${encodeURIComponent(username)}&answer=${encodeURIComponent(answer)}&callback=handlePoll`;
       const script = document.createElement('script');
       script.src = url;
       document.body.appendChild(script);
     });
+
     function handlePoll(response) {
+      Swal.close();
       if (response.success) {
         document.getElementById('pollForm').style.display = 'none';
         document.getElementById('thankYou').style.display = 'block';
