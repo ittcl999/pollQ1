@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+</head>
+<body>
+  <h2>เข้าสู่ระบบ</h2>
+  <form id="loginForm">
+    <label>Username: <input type="text" id="username" required></label><br>
+    <label>Password: <input type="password" id="password" required></label><br>
+    <button type="submit">เข้าสู่ระบบ</button>
+  </form>
+
+  <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycb.../exec'; // แทนด้วย Web App URL ของคุณ
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const url = `${SCRIPT_URL}?action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&callback=handleLogin`;
+
+      const script = document.createElement('script');
+      script.src = url;
+      document.body.appendChild(script);
+    });
+
+    function handleLogin(response) {
+      if (response.success) {
+        localStorage.setItem('username', response.username);
+        localStorage.setItem('fullname', response.fullname);
+        window.location.href = 'poll.html';
+      } else {
+        alert('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+      }
+    }
+  </script>
+</body>
+</html>
