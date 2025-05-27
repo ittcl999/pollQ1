@@ -78,7 +78,11 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
+    .swal2-popup {
+      font-family: 'Prompt', sans-serif !important;
+      font-size: 1.05rem !important;
+      border-radius: 16px !important;
+    }
   </style>
 </head>
 <body>
@@ -129,15 +133,18 @@ function handleLoginCheck(response) {
   localStorage.setItem('username', response.username);
   localStorage.setItem('fullname', response.fullname);
   if (response.answered) {
-  Swal.fire({
+    Swal.fire({
     icon: 'info',
     title: 'คุณได้ตอบแบบสำรวจแล้ว',
     text: `เมื่อวันที่ ${response.timestamp}`,
-    confirmButtonText: 'ตกลง'
+    confirmButtonText: 'กลับหน้าเข้าสู่ระบบ',
+    customClass: {
+      popup: 'swal2-popup'
+    }
   }).then(() => {
     document.querySelector('.login-box').style.display = 'block';
     document.getElementById('loaderBox').style.display = 'none';
-    document.getElementById('loginForm').reset(); // รีเซ็ตช่องกรอก
+    document.getElementById('loginForm').reset();
   });
 } else {
     window.location.href = 'poll.html';
