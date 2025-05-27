@@ -129,13 +129,17 @@ function handleLoginCheck(response) {
   localStorage.setItem('username', response.username);
   localStorage.setItem('fullname', response.fullname);
   if (response.answered) {
-    Swal.fire({
-      icon: 'info',
-      title: 'คุณได้ตอบแบบสำรวจแล้ว',
-      text: `เมื่อวันที่ ${response.timestamp}`,
-      confirmButtonText: 'ตกลง'
-    });
-  } else {
+  Swal.fire({
+    icon: 'info',
+    title: 'คุณได้ตอบแบบสำรวจแล้ว',
+    text: `เมื่อวันที่ ${response.timestamp}`,
+    confirmButtonText: 'ตกลง'
+  }).then(() => {
+    document.querySelector('.login-box').style.display = 'block';
+    document.getElementById('loaderBox').style.display = 'none';
+    document.getElementById('loginForm').reset(); // รีเซ็ตช่องกรอก
+  });
+} else {
     window.location.href = 'poll.html';
   }
 }
