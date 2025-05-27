@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Poll</title>
+</head>
+<body>
+  <h2>แบบสำรวจ</h2>
+  <p id="welcomeText"></p>
+
+  <form id="pollForm">
+    <label><input type="radio" name="answer" value="ไม่เคยเลย" required> ไม่เคยเลย</label><br>
+    <label><input type="radio" name="answer" value="เคยเห็นผ่าน intranet"> เคยเห็นผ่าน intranet</label><br>
+    <label><input type="radio" name="answer" value="ได้รับอีเมลแจ้ง"> ได้รับอีเมลแจ้ง</label><br>
+    <label><input type="radio" name="answer" value="มีเจ้าหน้าที่มาแนะนำ"> มีเจ้าหน้าที่มาแนะนำ</label><br>
+    <button type="submit">ส่งคำตอบ</button>
+  </form>
+
+  <p id="thankYou" style="display:none;">✅ ขอบคุณสำหรับการตอบแบบสำรวจ</p>
+
+  <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycb.../exec';
+
+    const fullname = localStorage.getItem('fullname');
+    const username = localStorage.getItem('username');
+    document.getElementById('welcomeText').textContent = `👋 สวัสดีคุณ ${fullname}`;
+
+    document.getElementById('pollForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const answer = document.querySelector('input[name="answer"]:checked').value;
+
+      const url = `${SCRIPT_URL}?action=submitPoll&username=${encodeURIComponent(username)}&answer=${encodeURIComponent(answer)}&callback=handlePoll`;
+
+      const script = document.createElement('script');
+      script.src = url;
+      document.body.appendChild(script);
+    });
+
+    function handlePoll(response) {
+      if (response.success) {
+        document.getElementById('pollForm').style.display = 'none';
+        document.getElementById('thankYou').style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
