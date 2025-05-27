@@ -1,20 +1,49 @@
+<!-- ✅ index.html: ตรวจสอบสิทธิ์ก่อนเข้าสำรวจ -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>ตรวจสอบสิทธิ์การตอบแบบสำรวจ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ตรวจสอบสิทธิ์</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: 'Prompt', sans-serif;
+      background: linear-gradient(to right, #eef2f7, #e0f2fe);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #1e293b;
       text-align: center;
-      padding-top: 100px;
+    }
+    .card {
+      background: white;
+      padding: 2rem 3rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 90%;
+    }
+    h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      color: #1d4ed8;
+    }
+    p {
+      font-size: 1rem;
+      margin-top: 0.5rem;
     }
   </style>
 </head>
 <body>
-  <h2>กำลังตรวจสอบข้อมูลของคุณ...</h2>
+  <div class="card">
+    <h2>📋 กำลังตรวจสอบสิทธิ์การตอบแบบสำรวจ</h2>
+    <p>โปรดรอสักครู่ ระบบกำลังตรวจสอบว่าคุณเคยตอบแบบสำรวจแล้วหรือไม่</p>
+  </div>
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9fvC2qb0TE4ZClFDUjHhjvonZCdrT8eCGFSgQzI5ifKU_HBEP0pv7nWejmOxFpitR/exec';
@@ -32,12 +61,12 @@
     } else {
       Swal.fire({
         title: 'กำลังตรวจสอบ...',
+        text: 'กรุณารอสักครู่',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
       });
 
       const url = `${SCRIPT_URL}?action=checkAnswered&username=${encodeURIComponent(username)}&callback=handleCheck`;
-
       const script = document.createElement('script');
       script.src = url;
       document.body.appendChild(script);
@@ -49,7 +78,7 @@
         Swal.fire({
           icon: 'info',
           title: 'คุณได้ตอบแบบสำรวจแล้ว',
-          text: 'ขอบคุณที่ให้ความร่วมมือ',
+          text: 'ขอบคุณที่ให้ความร่วมมือกับเรา',
           confirmButtonText: 'ตกลง'
         });
       } else {
