@@ -1,4 +1,4 @@
-<!-- ✅ Poll.html -->
+<!-- ✅ Poll.html: แบบสำรวจพร้อม redirect และตรวจสอบสิทธิ์ -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -40,12 +40,6 @@
     button:hover {
       background-color: #2563eb;
     }
-    .thank-you {
-      margin-top: 2rem;
-      color: #0f5132;
-      font-weight: bold;
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -58,12 +52,24 @@
     <label><input type="radio" name="answer" value="มีเจ้าหน้าที่มาแนะนำ"> มีเจ้าหน้าที่มาแนะนำ</label>
     <button type="submit">ส่งคำตอบ</button>
   </form>
-  <p class="thank-you" id="thankYou">✅ ขอบคุณสำหรับการตอบแบบสำรวจ</p>
+
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9fvC2qb0TE4ZClFDUjHhjvonZCdrT8eCGFSgQzI5ifKU_HBEP0pv7nWejmOxFpitR/exec';
     const fullname = localStorage.getItem('fullname');
     const username = localStorage.getItem('username');
-    document.getElementById('welcomeText').textContent = `👋 สวัสดีคุณ ${fullname}`;
+
+    if (!username || !fullname) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'กรุณาเข้าสู่ระบบก่อน',
+        confirmButtonText: 'กลับหน้า Login'
+      }).then(() => {
+        window.location.href = 'index.html';
+      });
+    } else {
+      document.getElementById('welcomeText').textContent = `👋 สวัสดีคุณ ${fullname}`;
+    }
+
     document.getElementById('pollForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const answer = document.querySelector('input[name="answer"]:checked').value;
@@ -72,9 +78,7 @@
         title: 'กำลังส่งคำตอบ...',
         text: 'โปรดรอสักครู่',
         allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
+        didOpen: () => Swal.showLoading()
       });
 
       const url = `${SCRIPT_URL}?action=submitPoll&username=${encodeURIComponent(username)}&answer=${encodeURIComponent(answer)}&callback=handlePoll`;
@@ -86,8 +90,13 @@
     function handlePoll(response) {
       Swal.close();
       if (response.success) {
-        document.getElementById('pollForm').style.display = 'none';
-        document.getElementById('thankYou').style.display = 'block';
+        Swal.fire({
+          icon: 'success',
+          title: `ขอบคุณคุณ ${fullname}`,
+          text: 'คำตอบของคุณถูกบันทึกเรียบร้อยแล้ว'
+        }).then(() => {
+          window.location.href = 'end.html';
+        });
       }
     }
   </script>
